@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ujian Online CBT - Negara Sahabat Asia Tenggara & Asia Selatan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; user-select: none; }
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        @keyframes pulse-red {
+            0%, 100% { background-color: #ef4444; color: #ffffff; }
+            50% { background-color: #fee2e2; color: #991b1b; }
+        }
+        .timer-warning { animation: pulse-red 1s infinite; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col text-slate-800">
+    <header class="bg-blue-900 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white text-blue-900 font-bold p-2 rounded-lg text-lg flex items-center justify-center w-10 h-10 shadow">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-base md:text-lg leading-tight">CBT UJIAN ONLINE</h1>
+                    <p class="text-xs text-blue-200">Mengenal Negara Sahabat (Asia Tenggara & Asia Selatan)</p>
+                </div>
+            </div>
+            <div id="header-exam-info" class="hidden flex items-center space-x-4">
+                <div class="hidden sm:block text-right border-r border-blue-700 pr-4">
+                    <div id="user-display-name" class="font-semibold text-sm">Nama User</div>
+                    <div id="user-display-team" class="text-xs text-blue-200">Nama Regu</div>
+                </div>
+                <div id="timer-box" class="bg-blue-800 px-4 py-1.5 rounded-lg border border-blue-600 text-center font-mono font-bold text-lg md:text-xl tracking-wider">
+                    <span id="timer-display">25:00</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 flex flex-col justify-center">
+        <div id="screen-login" class="max-w-md w-full mx-auto bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden my-auto">
+            <div class="bg-blue-700 p-6 text-white text-center">
+                <i class="fa-solid fa-clipboard-question text-5xl mb-3 text-blue-200"></i>
+                <h2 class="text-2xl font-bold">Konfirmasi Data Peserta</h2>
+                <p class="text-xs text-blue-100 mt-1">Silakan isi data sebelum memulai ujian pilihan ganda.</p>
+            </div>
+            <form id="form-login" onsubmit="startExam(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Regu / Kelompok <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="fa-solid fa-users"></i></span>
+                        <input type="text" id="input-team" required placeholder="Contoh: Regu Elang / Kelompok 1" class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm transition">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Pribadi / Lengkap <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="fa-solid fa-user"></i></span>
+                        <input type="text" id="input-name" required placeholder="Contoh: Ahmad Dahlan" class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm transition">
+                    </div>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 text-xs text-slate-600 space-y-1.5">
+                    <p class="font-semibold text-slate-800"><i class="fa-solid fa-circle-info text-blue-600 mr-1"></i> Petunjuk Ujian:</p>
+                    <ul class="list-disc list-inside space-y-1 pl-1">
+                        <li>Jumlah Soal: <strong>100 Butir</strong> (Pilihan Ganda A, B, C, D)</li>
+                        <li>Waktu Pengerjaan: <strong>25 Menit</strong></li>
+                        <li>Peringatan waktu merah akan aktif pada <strong>3 menit terakhir</strong>.</li>
+                        <li>Hasil evaluasi dan jawaban benar akan ditampilkan setelah selesai.</li>
+                    </ul>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg shadow-md transition transform active:scale-95 flex items-center justify-center space-x-2">
+                    <span>Mulai Ujian Sekarang</span><i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
+        </div>
+
+        <div id="screen-exam" class="hidden flex-grow flex flex-col lg:flex-row gap-6">
+            <div class="flex-grow flex flex-col bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
+                <div class="bg-slate-100 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+                    <div class="font-bold text-slate-700 text-base md:text-lg">Soal No. <span id="current-question-num" class="text-blue-700 text-xl font-extrabold">1</span> / 100</div>
+                    <div class="flex items-center space-x-2">
+                        <label class="flex items-center space-x-2 cursor-pointer bg-amber-50 hover:bg-amber-100 text-amber-800 px-3 py-1.5 rounded-lg border border-amber-300 text-xs font-semibold transition">
+                            <input type="checkbox" id="checkbox-doubt" onchange="toggleDoubt()" class="rounded text-amber-600 focus:ring-amber-500 w-4 h-4"><span>Ragu-Ragu</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="p-6 flex-grow flex flex-col justify-between space-y-6">
+                    <div>
+                        <div id="question-text" class="text-base md:text-lg font-medium text-slate-800 leading-relaxed mb-6">Loading soal...</div>
+                        <div id="options-container" class="space-y-3"></div>
+                    </div>
+                    <div class="pt-6 border-t border-slate-100 flex justify-between items-center gap-2">
+                        <button id="btn-prev" onclick="navigateQuestion(-1)" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed text-sm flex items-center space-x-2"><i class="fa-solid fa-chevron-left"></i><span>Sebelumnya</span></button>
+                        <button id="btn-next" onclick="navigateQuestion(1)" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition text-sm flex items-center space-x-2"><span>Berikutnya</span><i class="fa-solid fa-chevron-right"></i></button>
+                        <button id="btn-finish" onclick="confirmFinishExam()" class="hidden px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition text-sm flex items-center space-x-2 shadow"><i class="fa-solid fa-check-double"></i><span>Selesai Ujian</span></button>
+                    </div>
+                </div>
+            </div>
+            <div class="w-full lg:w-80 flex-shrink-0 bg-white rounded-xl shadow-md border border-slate-200 p-5 flex flex-col justify-between">
+                <div>
+                    <h3 class="font-bold text-slate-700 border-b pb-3 mb-4 flex justify-between items-center text-sm">
+                        <span><i class="fa-solid fa-border-all text-blue-600 mr-2"></i>Navigasi Soal</span>
+                        <span id="answered-count" class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-semibold">0 / 100</span>
+                    </h3>
+                    <div class="grid grid-cols-3 gap-1 mb-4 text-[11px] text-slate-600 font-medium">
+                        <div class="flex items-center space-x-1"><span class="w-3 h-3 bg-blue-600 rounded-sm inline-block"></span><span>Dijawab</span></div>
+                        <div class="flex items-center space-x-1"><span class="w-3 h-3 bg-amber-400 rounded-sm inline-block"></span><span>Ragu</span></div>
+                        <div class="flex items-center space-x-1"><span class="w-3 h-3 bg-slate-200 border border-slate-300 rounded-sm inline-block"></span><span>Belum</span></div>
+                    </div>
+                    <div id="question-grid" class="grid grid-cols-5 gap-2 max-h-80 lg:max-h-[380px] overflow-y-auto custom-scroll p-1"></div>
+                </div>
+                <div class="mt-6 pt-4 border-t border-slate-100">
+                    <button onclick="confirmFinishExam()" class="w-full py-2.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg text-sm font-semibold transition flex items-center justify-center space-x-2"><i class="fa-solid fa-paper-plane"></i><span>Hentikan & Kumpulkan</span></button>
+                </div>
+            </div>
+        </div>
+
+        <div id="screen-result" class="hidden max-w-4xl w-full mx-auto space-y-6 my-4">
+            <div class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+                <div class="bg-slate-900 text-white p-6 md:p-8 text-center relative">
+                    <div class="inline-block p-3 bg-blue-600/20 rounded-full mb-3"><i class="fa-solid fa-trophy text-4xl text-amber-400"></i></div>
+                    <h2 class="text-2xl md:text-3xl font-extrabold">Hasil Ujian CBT</h2>
+                    <p class="text-slate-300 text-sm mt-1">Mengenal Negara Sahabat (Asia Tenggara & Asia Selatan)</p>
+                    <div class="mt-6 inline-flex flex-col items-center justify-center bg-white text-slate-900 px-8 py-4 rounded-2xl shadow-xl border-4 border-blue-500">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Nilai Akhir</span>
+                        <span id="score-val" class="text-4xl md:text-5xl font-black text-blue-600">0</span>
+                        <span class="text-xs text-slate-400 mt-1">Skala 0 - 100</span>
+                    </div>
+                </div>
+                <div class="p-6 bg-slate-50 border-b border-slate-200">
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                        <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm"><span class="text-xs text-slate-500 block">Nama Peserta</span><span id="result-name" class="font-bold text-slate-800 text-sm md:text-base truncate block">-</span></div>
+                        <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm"><span class="text-xs text-slate-500 block">Nama Regu</span><span id="result-team" class="font-bold text-slate-800 text-sm md:text-base truncate block">-</span></div>
+                        <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm"><span class="text-xs text-slate-500 block">Jawaban Benar</span><span id="result-correct" class="font-bold text-green-600 text-base md:text-lg">0</span></div>
+                        <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm"><span class="text-xs text-slate-500 block">Jawaban Salah</span><span id="result-wrong" class="font-bold text-red-600 text-base md:text-lg">0</span></div>
+                    </div>
+                </div>
+                <div class="p-4 bg-white flex flex-col sm:flex-row justify-between items-center gap-3">
+                    <div class="text-xs text-slate-500"><i class="fa-solid fa-circle-info text-blue-500 mr-1"></i> Periksa pembahasan di bawah untuk melihat analisis kesalahan Anda.</div>
+                    <button onclick="restartExam()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition shadow flex items-center space-x-2"><i class="fa-solid fa-rotate-right"></i><span>Ulangi Ujian</span></button>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-6 space-y-4">
+                <div class="flex items-center justify-between border-b pb-4">
+                    <h3 class="text-lg font-bold text-slate-800 flex items-center space-x-2"><i class="fa-solid fa-list-check text-blue-600"></i><span>Evaluasi & Pembahasan Detail</span></h3>
+                    <div class="flex space-x-1 bg-slate-100 p-1 rounded-lg text-xs font-semibold">
+                        <button onclick="filterReview('all')" id="filter-all" class="px-3 py-1 rounded-md bg-white shadow-sm text-slate-800">Semua</button>
+                        <button onclick="filterReview('wrong')" id="filter-wrong" class="px-3 py-1 rounded-md text-slate-600 hover:text-slate-900">Salah Saja</button>
+                        <button onclick="filterReview('correct')" id="filter-correct" class="px-3 py-1 rounded-md text-slate-600 hover:text-slate-900">Benar Saja</button>
+                    </div>
+                </div>
+                <div id="review-list" class="space-y-4"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 py-3 text-center text-xs text-slate-500">
+        &copy; 2026 CBT Ujian Online - Materi Negara Sahabat Asia Tenggara & Asia Selatan. All Rights Reserved.
+    </footer>
+
+    <div id="confirm-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-sm w-full p-6 text-center space-y-4">
+            <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto text-xl"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <h3 class="text-lg font-bold text-slate-800">Selesaikan Ujian?</h3>
+            <p id="modal-msg" class="text-xs text-slate-600 leading-relaxed">Apakah Anda yakin ingin mengakhiri dan mengumpulkan jawaban ujian sekarang?</p>
+            <div class="flex space-x-3 pt-2">
+                <button onclick="closeModal()" class="flex-1 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-semibold rounded-lg transition">Batal</button>
+                <button onclick="processFinishExam()" class="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition shadow">Ya, Selesai</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+const rawQuestions = [
+{q:"Siapakah nama Presiden Republik Indonesia yang mulai menjabat sejak Oktober 2024?",options:["Joko Widodo","Prabowo Subianto","Megawati Soekarnoputri","Susilo Bambang Yudhoyono"],answer:1,explain:"Prabowo Subianto resmi dilantik sebagai Presiden Republik Indonesia ke-8 pada tanggal 20 Oktober 2024."},
+{q:"Apa nama organisasi gerakan kepramukaan resmi di negara Indonesia?",options:["Boy Scouts of Indonesia","Gerakan Pramuka Indonesia","Persekutuan Pengakap Indonesia","Pramuka Nusantara"],answer:1,explain:"Gerakan Pramuka Indonesia adalah nama organisasi pendidikan nonformal yang menyelenggarakan pendidikan kepanduan di Indonesia."},
+{q:"Makanan tradisional khas Indonesia berupa daging sapi yang dimasak berjam-jam menggunakan rempah dan santan adalah...",options:["Nasi Goreng","Rendang","Sate Ayam","Gado-gado"],answer:1,explain:"Rendang adalah masakan khas Minangkabau yang diakui secara internasional sebagai salah satu makanan terlezat di dunia."},
+{q:"Ibu kota baru negara Indonesia yang berada di wilayah Kalimantan Timur bernama...",options:["Jakarta","Nusantara (IKN)","Nusantara City","Balikpapan"],answer:1,explain:"Ibu Kota Nusantara (IKN) ditetapkan sebagai ibu kota negara Indonesia pengganti Jakarta."},
+{q:"Mata uang resmi negara Malaysia adalah...",options:["Baht","Peso","Ringgit","Rupiah"],answer:2,explain:"Mata uang resmi Malaysia adalah Ringgit Malaysia (MYR)."},
+{q:"Apa nama organisasi Kepramukaan resmi di Malaysia?",options:["Persekutuan Pengakap Malaysia","Gerakan Pramuka Malaysia","Boy Scouts of Malaysia","Pengakap Diraja"],answer:0,explain:"Persekutuan Pengakap Malaysia (PPM) adalah organisasi kepanduan resmi di Malaysia."},
+{q:"Nasi Lemak merupakan makanan khas terkenal dari negara sahabat mana?",options:["Thailand","Singapore","Malaysia","Vietnam"],answer:2,explain:"Nasi Lemak dianggap sebagai salah satu hidangan nasional Malaysia."},
+{q:"Gelar untuk Kepala Negara Malaysia yang berganti setiap 5 tahun sekali dari para Sultan adalah...",options:["Presiden","Yang di-Pertuan Agong","Perdana Menteri","Sultan Agung"],answer:1,explain:"Kepala Negara Malaysia adalah Yang di-Pertuan Agong yang dipilih secara bergilir di antara 9 penguasa negeri Melayu."},
+{q:"Landmark terkenal Singapura berupa patung berkepala singa dan berbadan ikan dinamakan...",options:["Merlion","Marina Bay","Sentosa","Singa Taman"],answer:0,explain:"Merlion adalah maskot dan lambang ikonik berupa patung berbadan ikan dan berkepala singa di Singapura."},
+{q:"Organisasi Pandu/Pramuka di Singapura dikenal dengan nama...",options:["Singapore Scout Association","Gerakan Pengakap Singapura","Boy Scouts of Singapore","Singapore Youth Scout"],answer:0,explain:"The Singapore Scout Association (SSA) adalah organisasi kepanduan nasional Singapura."},
+{q:"Kepala pemerintah negara Singapura dipimpin oleh seorang...",options:["Presiden","Perdana Menteri","Raja","Sultan"],answer:1,explain:"Sistem pemerintahan Singapura adalah republik parlementer, di mana Perdana Menteri merupakan kepala pemerintahan."},
+{q:"Makanan populer khas Singapura yang terkenal di seluruh dunia adalah...",options:["Tom Yum","Hainanese Chicken Rice","Pho","Pad Thai"],answer:1,explain:"Hainanese Chicken Rice (Nasi Ayam Hainan) sangat identik dan populer sebagai kuliner Singapura."},
+{q:"Negara Thailand terkenal dengan sebutan...",options:["Negara Gajah Putih","Negara Tirai Bambu","Negara Mutiara Laut Selatan","Negara Zamrud Khatulistiwa"],answer:0,explain:"Thailand dijuluki Negara Gajah Putih karena gajah putih dianggap suci dan simbol kerajaan."},
+{q:"Mata uang resmi yang digunakan di negara Thailand adalah...",options:["Kip","Kyat","Baht","Riel"],answer:2,explain:"Baht adalah mata uang resmi negara Thailand."},
+{q:"Sup pedas asam khas Thailand yang berisi udang atau makanan laut dinamakan...",options:["Pho","Tom Yum","Som Tam","Laksa"],answer:1,explain:"Tom Yum (khususnya Tom Yum Goong) adalah sup khas Thailand dengan rasa asam pedas."},
+{q:"Organisasi kepanduan resmi di Thailand dinamakan...",options:["National Scout Organization of Thailand","Boy Scouts of Siam","Royal Thai Scouts","Thai Scout Movement"],answer:0,explain:"National Scout Organization of Thailand (NSOT) adalah badan kepanduan resmi di Thailand."},
+{q:"Tarian tradisional Thailand yang terkenal dengan gerak jemari dan busana emas bernama...",options:["Fonn Thai","Khon","Kecak","Manora"],answer:1,explain:"Khon adalah seni pertunjukan tari topeng klasik khas Thailand."},
+{q:"Ibu kota negara Filipina adalah...",options:["Cebu","Manila","Davao","Quezon City"],answer:1,explain:"Manila adalah ibu kota dari negara Filipina."},
+{q:"Organisasi Kepanduan untuk anak laki-laki di Filipina disebut...",options:["Boy Scouts of the Philippines","Filipino Scout Movement","Persekutuan Pengakap Filipina","Pramuka Filipina"],answer:0,explain:"Boy Scouts of the Philippines (BSP) adalah organisasi kepramukaan nasional di Filipina."},
+{q:"Makanan tradisional populer asal Filipina yang berbahan dasar olahan daging berbumbu cuka, kecap, dan bawang putih adalah...",options:["Adobo","Sinigang","Lechon","Balut"],answer:0,explain:"Adobo adalah hidangan paling populer di Filipina yang terdiri dari daging yang dimasak dalam cuka, kecap, dan bumbu."},
+{q:"Mata uang resmi yang digunakan di Filipina adalah...",options:["Peso Filipina","Dollar Filipina","Rupee","Dong"],answer:0,explain:"Mata uang negara Filipina adalah Peso Filipina (PHP)."},
+{q:"Negara Brunei Darussalam dipimpin oleh seorang raja yang bergelar...",options:["Presiden","Sultan","Perdana Menteri","Kaisar"],answer:1,explain:"Brunei Darussalam adalah kerajaan monarki absolut yang dipimpin oleh seorang Sultan."},
+{q:"Ibu kota negara Brunei Darussalam adalah...",options:["Bandar Seri Begawan","Kuala Belait","Tutong","Muara"],answer:0,explain:"Bandar Seri Begawan adalah ibu kota sekaligus kota terbesar di Brunei Darussalam."},
+{q:"Organisasi Kepanduan resmi di Brunei Darussalam adalah...",options:["Persekutuan Pengakap Negara Brunei Darussalam","Brunei Scout Movement","Royal Brunei Scouts","Pramuka Brunei"],answer:0,explain:"Persekutuan Pengakap Negara Brunei Darussalam (PPNBD) merupakan federasi kepanduan di Brunei."},
+{q:"Makanan khas tradisional Brunei yang terbuat dari sagu berserat kenyal adalah...",options:["Ambuyat","Rendang","Nasi Katok","Kupat"],answer:0,explain:"Ambuyat adalah makanan khas tradisional Brunei Darussalam yang berbahan dasar batang dalam pohon sagu."},
+{q:"Ibu kota negara Vietnam adalah...",options:["Ho Chi Minh","Hanoi","Da Nang","Haiphong"],answer:1,explain:"Hanoi adalah ibu kota Vietnam, sedangkan Ho Chi Minh City adalah kota terbesar."},
+{q:"Makanan khas Vietnam berupa mie beras berkuah bening dengan irisan daging sapi/ayam dinamakan...",options:["Pho","Banh Mi","Ramen","Udon"],answer:0,explain:"Pho adalah makanan nasional Vietnam berupa sup mie beras khas dengan daging."},
+{q:"Mata uang resmi negara Vietnam adalah...",options:["Dong","Kip","Riel","Kyat"],answer:0,explain:"Mata uang resmi Vietnam adalah Dong (VND)."},
+{q:"Pakaian tradisional wanita Vietnam yang anggun berupa gaun panjang berkain sutra dipadu celana panjang dinamakan...",options:["Ao Dai","Hanbok","Kimono","Kebaya"],answer:0,explain:"Ao Dai adalah pakaian adat nasional wanita di Vietnam."},
+{q:"Organisasi Pramuka di Vietnam dikenal dengan nama...",options:["Pathfinders Vietnam","Hội Hướng Đạo Việt Nam","Scout Vietnam","Vietnam Youth Scout"],answer:1,explain:"Hội Hướng Đạo Việt Nam adalah organisasi gerakan kepanduan di Vietnam."},
+{q:"Ibu kota negara Laos adalah...",options:["Vientiane","Luang Prabang","Pakse","Savannakhet"],answer:0,explain:"Vientiane (Wiang Chan) adalah ibu kota negara Laos."},
+{q:"Mata uang resmi yang digunakan oleh negara Laos adalah...",options:["Kip","Riel","Kyat","Baht"],answer:0,explain:"Mata uang negara Laos adalah Kip Laos (LAK)."},
+{q:"Laos merupakan satu-satunya negara di Asia Tenggara yang...",options:["Berbentuk kepulauan","Tidak memiliki garis pantai (Landlocked)","Bermata uang Dollar","Beriklim sub-tropis"],answer:1,explain:"Laos adalah satu-satunya negara terkurung daratan (landlocked country) di Asia Tenggara."},
+{q:"Makanan nasional khas Laos berupa salad daging cincang berbumbu pedas dan segar bernama...",options:["Larb (Larp)","Som Tam","Pho","Amok"],answer:0,explain:"Larb (Larp) dianggap sebagai masakan nasional khas Laos."},
+{q:"Ibu kota dari negara Kamboja adalah...",options:["Phnom Penh","Siem Reap","Battambang","Sihanoukville"],answer:0,explain:"Phnom Penh adalah ibu kota dan kota terbesar di Kamboja."},
+{q:"Mata uang resmi negara Kamboja adalah...",options:["Riel","Kip","Kyat","Dong"],answer:0,explain:"Mata uang resmi Kamboja adalah Riel Kamboja (KHR)."},
+{q:"Candi bersejarah termasyhur yang menjadi ikon dan kebanggaan pada bendera Kamboja adalah...",options:["Borobudur","Angkor Wat","Prambanan","Wat Arun"],answer:1,explain:"Angkor Wat adalah monumen keagamaan terbesar di dunia yang terletak di Kamboja."},
+{q:"Masakan hidangan kari ikan khas Kamboja yang dikukus dalam daun pisang bernama...",options:["Fish Amok","Tom Yum","Lok Lak","Adobo"],answer:0,explain:"Fish Amok adalah masakan tradisional paling terkenal di Kamboja."},
+{q:"Organisasi Kepanduan nasional di Kamboja adalah...",options:["National Scout Organization of Cambodia","Cambodia Youth Scout","Persekutuan Pengakap Kamboja","Royal Cambodian Scouts"],answer:0,explain:"National Scout Organization of Cambodia (NSOC) adalah federasi kepanduan di Kamboja."},
+{q:"Ibu kota negara Myanmar adalah...",options:["Yangon","Naypyidaw","Mandalay","Bago"],answer:1,explain:"Naypyidaw resmi menjadi ibu kota Myanmar menggantikan Yangon sejak tahun 2005."},
+{q:"Mata uang resmi negara Myanmar adalah...",options:["Kyat","Kip","Taka","Tugrik"],answer:0,explain:"Mata uang resmi Myanmar adalah Kyat Myanmar (MMK)."},
+{q:"Pakaian tradisional pria dan wanita di Myanmar berupa kain sarung yang diikat di pinggang dinamakan...",options:["Longyi","Sarong","Pha Biang","Hanbok"],answer:0,explain:"Longyi adalah pakaian tradisional khas Myanmar berupa sarung tubular."},
+{q:"Makanan hidangan mie sup ikan khas Myanmar yang menjadi sarapan populer adalah...",options:["Mohinga","Laksa","Ramen","Kway Teow"],answer:0,explain:"Mohinga adalah sup mie beras ikan tradisional khas Myanmar."},
+{q:"Ibu kota dari negara Timor Leste adalah...",options:["Dili","Baucau","Maliana","Same"],answer:0,explain:"Dili adalah ibu kota dan kota pelabuhan terbesar di Timor Leste."},
+{q:"Mata uang resmi yang digunakan dalam transaksi di Timor Leste selain koin Centavo adalah...",options:["Dolar Amerika Serikat (USD)","Rupiah","Escudo","Ringgit"],answer:0,explain:"Timor Leste menggunakan Dolar AS (USD) sebagai mata uang resmi negara."},
+{q:"Bahasa resmi negara Timor Leste adalah bahasa Tetum dan bahasa...",options:["Portugis","Spanyol","Inggris","Belanda"],answer:0,explain:"Dua bahasa resmi di Timor Leste adalah Bahasa Tetum dan Bahasa Portugis."},
+{q:"Organisasi Kepanduan di Timor Leste bernama...",options:["União dos Escuteiros de Timor-Leste","Timor Leste Scout","Pramuka Timor","Boy Scouts of Dili"],answer:0,explain:"União dos Escuteiros de Timor-Leste (UETL) adalah badan kepanduan di Timor Leste."},
+{q:"Negara di Asia Tenggara yang tidak pernah dijajah oleh bangsa Eropa adalah...",options:["Thailand","Vietnam","Filipina","Singapore"],answer:0,explain:"Thailand (dahulu Siam) adalah satu-satunya negara di Asia Tenggara yang bebas dari penjajahan Eropa."},
+{q:"Jumlah negara anggota resmi utama dalam perhimpunan ASEAN saat ini adalah...",options:["10 Negara","11 Negara","12 Negara","9 Negara"],answer:0,explain:"ASEAN memiliki 10 negara anggota utama (dengan Timor Leste dalam proses penyempurnaan keanggotaan ke-11)."},
+{q:"Sekretariat Jenderal ASEAN berkedudukan di kota...",options:["Jakarta","Bangkok","Kuala Lumpur","Manila"],answer:0,explain:"Gedung Sekretariat Jenderal ASEAN terletak di Jakarta, Indonesia."},
+{q:"Ibu kota negara India adalah...",options:["Mumbai","New Delhi","Kolkata","Bangalore"],answer:1,explain:"New Delhi adalah ibu kota negara India."},
+{q:"Mata uang resmi negara India adalah...",options:["Rupee India","Taka","Nu","Rufiyaa"],answer:0,explain:"Mata uang resmi India adalah Rupee India (INR)."},
+{q:"Bangunan megah berarsitektur Islam dari marmer putih di Agra, India yang menjadi salah satu keajaiban dunia adalah...",options:["Taj Mahal","Red Fort","Qutub Minar","Hawa Mahal"],answer:0,explain:"Taj Mahal adalah makam marmer putih yang dibangun oleh Kaisar Shah Jahan di Agra."},
+{q:"Organisasi gerakan Kepramukaan dan Pandu Putri di India dinamakan...",options:["The Bharat Scouts and Guides","Indian Scout Association","Scouts of India","Boy Scouts of Bharat"],answer:0,explain:"The Bharat Scouts and Guides (BSG) adalah organisasi kepramukaan nasional di India."},
+{q:"Pakaian tradisional wanita India yang dilapisi kain panjang melilit tubuh dinamakan...",options:["Sari","Kurti","Lehenga","Kimono"],answer:0,explain:"Sari adalah pakaian tradisional khas wanita India."},
+{q:"Masakan khas India yang terkenal dengan kuah kaya rempah pedas gurih dinamakan...",options:["Curry (Kari)","Tom Yum","Sushi","Adobo"],answer:0,explain:"Kari khas India dikenal di seluruh dunia dengan penggunaan bumbu dan rempah yang kuat."},
+{q:"Gelar kehormatan untuk Mahatma Gandhi yang dikenal sebagai Bapak Bangsa India berarti...",options:["Jiwa Agung","Pemimpin Besar","Raja Damai","Pahlawan Suci"],answer:0,explain:"Mahatma berasal dari bahasa Sansekerta yang berarti 'Jiwa Agung'."},
+{q:"Ibu kota negara Pakistan adalah...",options:["Karachi","Islamabad","Lahore","Rawalpindi"],answer:1,explain:"Islamabad adalah ibu kota resmi Pakistan."},
+{q:"Mata uang resmi yang digunakan di negara Pakistan adalah...",options:["Rupee Pakistan","Taka","Afghani","Rial"],answer:0,explain:"Mata uang negara Pakistan adalah Rupee Pakistan (PKR)."},
+{q:"Organisasi kepanduan resmi di Pakistan dinamakan...",options:["Pakistan Boy Scouts Association","Pakistan Scout Movement","Persekutuan Pengakap Pakistan","National Scouts of Pakistan"],answer:0,explain:"Pakistan Boy Scouts Association (PBSA) adalah organisasi kepramukaan di Pakistan."},
+{q:"Pakaian nasional pria dan wanita di Pakistan berupa baju longgar dan celana panjang dinamakan...",options:["Shalwar Kameez","Sari","Sherwani","Jubbah"],answer:0,explain:"Shalwar Kameez adalah pakaian tradisional khas dan nasional Pakistan."},
+{q:"Olahraga yang paling populer dan digemari oleh masyarakat Pakistan dan India adalah...",options:["Kriket","Sepak Bola","Bulu Tangkis","Bola Basket"],answer:0,explain:"Kriket adalah olahraga paling populer di wilayah Asia Selatan khususnya India dan Pakistan."},
+{q:"Ibu kota negara Bangladesh adalah...",options:["Dhaka","Chittagong","Sylhet","Khulna"],answer:0,explain:"Dhaka adalah ibu kota dan kota terbesar di Bangladesh."},
+{q:"Mata uang resmi yang digunakan di Bangladesh dinamakan...",options:["Taka","Rupee","Kyat","Ngulrum"],answer:0,explain:"Mata uang resmi Bangladesh adalah Taka Bangladesh (BDT)."},
+{q:"Organisasi Kepramukaan di Bangladesh dikenal dengan nama...",options:["Bangladesh Scouts","Boy Scouts of Bangladesh","Scout Taka","National Bangladesh Scout"],answer:0,explain:"Bangladesh Scouts adalah organisasi kepanduan nasional Bangladesh."},
+{q:"Makanan pokok khas Bangladesh yang umumnya disajikan sehari-hari adalah...",options:["Nasi dan Kari Ikan (Bhat-Mach)","Roti Naan","Biryani Sapi","Kebab"],answer:0,explain:"Nasi dan ikan (Machh-e Bhati Bangali) merupakan makanan pokok tradisional warga Bangladesh."},
+{q:"Ibu kota dari negara Sri Lanka adalah...",options:["Colombo","Sri Jayawardenepura Kotte","Kandy","Galle"],answer:1,explain:"Sri Jayawardenepura Kotte adalah ibu kota administratif resmi Sri Lanka (Colombo sebagai ibu kota komersial)."},
+{q:"Mata uang resmi negara Sri Lanka adalah...",options:["Rupee Sri Lanka","Taka","Rufiyaa","Dollar Sri Lanka"],answer:0,explain:"Mata uang Sri Lanka adalah Rupee Sri Lanka (LKR)."},
+{q:"Sri Lanka sangat terkenal di dunia sebagai produsen dan penghasil...",options:["Teh Ceylon","Kopi Robusta","Padi Organik","Cengkeh"],answer:0,explain:"Teh Ceylon khas Sri Lanka adalah salah satu teh berkualitas terbaik dan terkenal di dunia."},
+{q:"Organisasi Kepanduan nasional di Sri Lanka dinamakan...",options:["Sri Lanka Scout Association","Boy Scouts of Lanka","Ceylon Scout Movement","National Scouts Sri Lanka"],answer:0,explain:"Sri Lanka Scout Association (SLSA) adalah badan kepanduan resmi Sri Lanka."},
+{q:"Landmark bersejarah berupa benteng batu raksasa kuno yang terkenal di Sri Lanka bernama...",options:["Sigiriya","Taj Mahal","Angkor Wat","Borobudur"],answer:0,explain:"Sigiriya (Batu Singa) adalah benteng kuno dan istana batu megah di Sri Lanka."},
+{q:"Ibu kota dari negara Nepal adalah...",options:["Kathmandu","Pokhara","Lalitpur","Biratnagar"],answer:0,explain:"Kathmandu adalah ibu kota sekaligus kota terbesar di Nepal."},
+{q:"Gunung tertinggi di dunia yang berada di perbatasan negara Nepal dan Tibet/Tiongkok bernama...",options:["Gunung Everest (Sagarmatha)","Gunung K2","Gunung Kangchenjunga","Gunung Annapurna"],answer:0,explain:"Gunung Everest (puncak tertinggi bumi) terletak di wilayah Nepal."},
+{q:"Mata uang resmi negara Nepal adalah...",options:["Rupee Nepal","Nu","Taka","Yen"],answer:0,explain:"Mata uang resmi negara Nepal adalah Rupee Nepal (NPR)."},
+{q:"Organisasi Pramuka resmi di Nepal dinamakan...",options:["Nepal Scouts","Boy Scouts of Nepal","Himalayan Scouts","Royal Nepal Scouts"],answer:0,explain:"Nepal Scouts adalah organisasi kepanduan resmi nasional di Nepal."},
+{q:"Makanan pangsit khas Nepal dan Tibet yang diisi daging atau sayuran dinamakan...",options:["Momo","Dimsum","Gyoza","Baozi"],answer:0,explain:"Momo adalah sejenis pangsit kukus tradisional khas Nepal yang sangat populer."},
+{q:"Satu-satunya bendera negara di dunia yang tidak berbentuk segi empat (berbentuk dua segitiga) adalah bendera negara...",options:["Nepal","Bhutan","Maladewa","Sri Lanka"],answer:0,explain:"Bendera Nepal adalah satu-satunya bendera nasional non-quadrilateral (dua segitiga bersusun)."},
+{q:"Ibu kota negara Bhutan adalah...",options:["Thimphu","Paro","Punakha","Phuntsholing"],answer:0,explain:"Thimphu adalah ibu kota dan kota terbesar di Kerajaan Bhutan."},
+{q:"Mata uang resmi negara Bhutan adalah...",options:["Ngultrum (Nu)","Rupee","Kyat","Taka"],answer:0,explain:"Mata uang resmi Kerajaan Bhutan adalah Ngultrum Bhutan (BTN)."},
+{q:"Negara Bhutan dijuluki oleh masyarakat lokalnya sebagai Druk Yul yang artinya...",options:["Land of the Thunder Dragon (Negara Naga Guntur)","Negara Atas Awan","Negara Benteng Hijau","Negara Pegunungan Suci"],answer:0,explain:"Bhutan dikenal sebagai 'Druk Yul' yang berarti Land of the Thunder Dragon (Negara Naga Guntur)."},
+{q:"Pakaian tradisional pria khas Bhutan yang diikat di pinggang dinamakan...",options:["Gho","Kira","Sari","Longyi"],answer:0,explain:"Gho adalah pakaian tradisional pria di Bhutan, sedangkan wanita mengenakan Kira."},
+{q:"Organisasi Kepanduan nasional di Bhutan adalah...",options:["Bhutan Scout Association","Dragon Scouts","Royal Bhutan Scouts","Boy Scouts of Bhutan"],answer:0,explain:"Bhutan Scout Association (BSA) adalah organisasi kepanduan di Kerajaan Bhutan."},
+{q:"Makanan nasional khas Bhutan berupa masakan cabai pedas bersaus keju bernama...",options:["Ema Datshi","Momo","Kari Keju","Tom Yum"],answer:0,explain:"Ema Datshi (cabai dan keju) adalah hidangan nasional paling terkenal di Bhutan."},
+{q:"Ibu kota negara Maladewa (Maldives) adalah...",options:["Malé","Addu City","Fuvahmulah","Hithadhoo"],answer:0,explain:"Malé adalah ibu kota negara kepulauan Maladewa (Maldives)."},
+{q:"Mata uang resmi negara Maladewa adalah...",options:["Rufiyaa","Rupee","Dollar Maladewa","Dinar"],answer:0,explain:"Mata uang resmi Maladewa adalah Rufiyaa Maladewa (MVR)."},
+{q:"Organisasi Kepanduan resmi di Maladewa dinamakan...",options:["The Scout Association of Maldives","Maldives Boy Scouts","Island Scouts Maldives","National Maldives Scout"],answer:0,explain:"The Scout Association of Maldives adalah organisasi kepramukaan di Maladewa."},
+{q:"Makanan khas tradisional Maladewa berbahan dasar olahan ikan tongkol/tuna dan kelapa dinamakan...",options:["Mas Huni","Garudhiya","Roti Roshi","Ambuyat"],answer:0,explain:"Mas Huni adalah sarapan khas Maladewa berisi kelapa parut, tuna, bawang, dan cabai."},
+{q:"Ibu kota negara Afganistan adalah...",options:["Kabul","Kandahar","Herat","Mazar-i-Sharif"],answer:0,explain:"Kabul adalah ibu kota sekaligus kota terbesar di Afganistan."},
+{q:"Mata uang resmi negara Afganistan adalah...",options:["Afghani","Rial","Dinar","Dirham"],answer:0,explain:"Mata uang resmi negara Afganistan adalah Afghani (AFN)."},
+{q:"Makanan olahan nasi rempah aromatik khas Afganistan berserta daging domba/kambing dan kismis dinamakan...",options:["Kabuli Palaw","Biryani","Nasi Mandhi","Kebap"],answer:0,explain:"Kabuli Palaw diakui sebagai masakan hidangan nasional negara Afganistan."},
+{q:"Asosiasi Kepanduan di Afganistan dikenal dengan nama...",options:["Afghanistan Scout Association","Afghani Scouts","Boy Scouts of Kabul","Afghan Youth Scout"],answer:0,explain:"Afghanistan Scout Association (Da Afghanistan Zoarani Satana) adalah badan kepanduan di Afganistan."},
+{q:"Asosiasi Kerja Sama Regional Asia Selatan untuk pembangunan ekonomi dan regional dikenal dengan singkatan...",options:["SAARC","ASEAN","APEC","OIC"],answer:0,explain:"SAARC (South Asian Association for Regional Cooperation) adalah organisasi regional negara-negara Asia Selatan."},
+{q:"Negara kepulauan terkecil di Asia berdasarkan luas wilayah dan jumlah penduduk adalah...",options:["Maladewa","Singapura","Brunei","Sri Lanka"],answer:0,explain:"Maladewa (Maldives) adalah negara terkecil di Asia baik luas daratan maupun populasi."},
+{q:"Simbol hewan naga berkaki empat pada bendera negara Bhutan dinamakan naga...",options:["Druk","Komodo","Shenlong","Ananta"],answer:0,explain:"Druk adalah 'Naga Guntur' mitologi dalam budaya Bhutan yang menghiasi benderanya."},
+{q:"Sungai Suci dan terpanjang di India yang dianggap sakral oleh umat Hindu adalah Sungai...",options:["Gangga","Indus","Brahmaputra","Mekong"],answer:0,explain:"Sungai Gangga adalah sungai paling suci dalam agama Hindu dan penting di India."},
+{q:"Bahasa resmi dan bahasa nasional utama yang dituturkan di Bangladesh adalah...",options:["Bengali","Hindi","Urdu","Pashto"],answer:0,explain:"Bahasa Bengali (Bangla) adalah bahasa resmi nasional Bangladesh."},
+{q:"Seni beladiri tradisional khas India yang dianggap salah satu tertua di dunia adalah...",options:["Kalaripayattu","Silat","Muay Thai","Taekwondo"],answer:0,explain:"Kalaripayattu adalah seni bela diri kuno yang berasal dari Kerala, India."},
+{q:"Tarian klasik khas India yang kaya ekspresi wajah dan gerakan tangan (mudra) adalah...",options:["Bharatanatyam","Kathakali","Kecak","Tari Lilin"],answer:0,explain:"Bharatanatyam adalah salah satu tarian klasik tertua khas dari India Selatan."},
+{q:"Bunga nasional resmi negara Indonesia yang bergelar Puspa Bangsa adalah...",options:["Melati Putih","Anggrek Bulan","Rafflesia Arnoldii","Mawar"],answer:0,explain:"Melati Putih (Jasminum sambac) ditetapkan sebagai Puspa Bangsa Indonesia."},
+{q:"Jumlah total negara anggota yang tergabung dalam organisasi kerjasama Asia Selatan SAARC adalah...",options:["8 Negara","10 Negara","5 Negara","12 Negara"],answer:0,explain:"SAARC beranggotakan 8 negara: Afganistan, Bangladesh, Bhutan, India, Maladewa, Nepal, Pakistan, dan Sri Lanka."}
+];
+
+const QUESTION_COUNT = rawQuestions.length;
+let userAnswers = new Array(QUESTION_COUNT).fill(null);
+let userDoubt = new Array(QUESTION_COUNT).fill(false);
+let currentIndex = 0;
+let timerInterval = null;
+let totalSeconds = 25 * 60;
+let userData = {team:'', name:''};
+let currentFilter = 'all';
+let examFinished = false;
+
+function startExam(e) {
+    e.preventDefault();
+    if (examFinished) resetExamState();
+    const teamInput = document.getElementById('input-team').value.trim();
+    const nameInput = document.getElementById('input-name').value.trim();
+    if (!teamInput || !nameInput) { alert('Silakan lengkapi Nama Regu dan Nama Pribadi!'); return; }
+    userData.team = teamInput; userData.name = nameInput;
+    document.getElementById('user-display-team').innerText = 'Regu: ' + userData.team;
+    document.getElementById('user-display-name').innerText = userData.name;
+    document.getElementById('header-exam-info').classList.remove('hidden');
+    document.getElementById('screen-login').classList.add('hidden');
+    document.getElementById('screen-exam').classList.remove('hidden');
+    renderQuestionGrid(); loadQuestion(0); startTimer();
+}
+function startTimer() {
+    clearInterval(timerInterval); updateTimerDisplay();
+    timerInterval = setInterval(() => {
+        totalSeconds--; updateTimerDisplay();
+        if (totalSeconds <= 180 && totalSeconds > 0) document.getElementById('timer-box').classList.add('timer-warning');
+        if (totalSeconds <= 0) {
+            clearInterval(timerInterval);
+            alert('Waktu ujian telah habis! Jawaban Anda akan otomatis dikumpulkan.');
+            processFinishExam();
+        }
+    }, 1000);
+}
+function updateTimerDisplay() {
+    const minutes = Math.floor(totalSeconds / 60), seconds = totalSeconds % 60;
+    document.getElementById('timer-display').innerText = `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+}
+function renderQuestionGrid() {
+    const grid = document.getElementById('question-grid'); grid.innerHTML = '';
+    for (let i=0; i<QUESTION_COUNT; i++) {
+        const btn = document.createElement('button'); btn.id = `grid-btn-${i}`; btn.innerText = i+1;
+        btn.onclick = () => jumpToQuestion(i); btn.className = getGridBtnClass(i); grid.appendChild(btn);
+    }
+    updateAnsweredCount();
+}
+function getGridBtnClass(index) {
+    let base = "w-full aspect-square rounded-md font-bold text-xs flex items-center justify-center transition border ";
+    if (index === currentIndex) base += "ring-2 ring-blue-600 ring-offset-1 ";
+    if (userDoubt[index]) return base + "bg-amber-400 text-white border-amber-500 shadow-sm";
+    if (userAnswers[index] !== null) return base + "bg-blue-600 text-white border-blue-700 shadow-sm";
+    return base + "bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200";
+}
+function updateGridButton(index) {
+    const btn = document.getElementById(`grid-btn-${index}`);
+    if (btn) btn.className = getGridBtnClass(index);
+    updateAnsweredCount();
+}
+function updateAnsweredCount() {
+    const count = userAnswers.filter(a => a !== null).length;
+    document.getElementById('answered-count').innerText = `${count} / ${QUESTION_COUNT}`;
+}
+function loadQuestion(index) {
+    const previous = currentIndex; currentIndex = index;
+    updateGridButton(previous); updateGridButton(currentIndex);
+    const qData = rawQuestions[currentIndex];
+    document.getElementById('current-question-num').innerText = currentIndex+1;
+    document.getElementById('question-text').innerText = qData.q;
+    document.getElementById('checkbox-doubt').checked = userDoubt[currentIndex];
+    const container = document.getElementById('options-container'); container.innerHTML = '';
+    const labels = ['A','B','C','D'];
+    qData.options.forEach((opt, i) => {
+        const selected = userAnswers[currentIndex] === i;
+        const div = document.createElement('div');
+        div.onclick = () => selectOption(i);
+        div.className = `flex items-center p-3.5 md:p-4 rounded-xl border-2 cursor-pointer transition ${selected ? 'border-blue-600 bg-blue-50/70 text-blue-950 font-medium shadow-sm' : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700 hover:bg-slate-50'}`;
+        const marker = document.createElement('div');
+        marker.className = `w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm mr-3 transition ${selected ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 border border-slate-300'}`;
+        marker.textContent = labels[i];
+        const text = document.createElement('div'); text.className = 'text-sm md:text-base leading-snug flex-grow'; text.textContent = opt;
+        div.append(marker,text); container.appendChild(div);
+    });
+    document.getElementById('btn-prev').disabled = currentIndex === 0;
+    document.getElementById('btn-next').classList.toggle('hidden', currentIndex === QUESTION_COUNT-1);
+    document.getElementById('btn-finish').classList.toggle('hidden', currentIndex !== QUESTION_COUNT-1);
+}
+function selectOption(index) { userAnswers[currentIndex] = index; loadQuestion(currentIndex); }
+function toggleDoubt() { userDoubt[currentIndex] = document.getElementById('checkbox-doubt').checked; updateGridButton(currentIndex); }
+function navigateQuestion(step) { const next = currentIndex+step; if (next>=0 && next<QUESTION_COUNT) loadQuestion(next); }
+function jumpToQuestion(index) { loadQuestion(index); }
+function confirmFinishExam() {
+    const unanswered = userAnswers.filter(a=>a===null).length, doubts = userDoubt.filter(Boolean).length;
+    let msg = 'Apakah Anda yakin ingin mengakhiri ujian ini?';
+    if (unanswered || doubts) msg = `Masih ada ${unanswered} soal BELUM DIJAWAB dan ${doubts} soal RAGU-RAGU. Yakin ingin mengumpulkan sekarang?`;
+    document.getElementById('modal-msg').innerText = msg;
+    document.getElementById('confirm-modal').classList.remove('hidden');
+}
+function closeModal() { document.getElementById('confirm-modal').classList.add('hidden'); }
+function processFinishExam() {
+    if (examFinished) return;
+    examFinished = true; clearInterval(timerInterval); closeModal();
+    let correct = 0;
+    rawQuestions.forEach((q,i)=>{ if (userAnswers[i]===q.answer) correct++; });
+    const wrong = QUESTION_COUNT-correct;
+    document.getElementById('score-val').innerText = Math.round(correct/QUESTION_COUNT*100);
+    document.getElementById('result-name').innerText = userData.name;
+    document.getElementById('result-team').innerText = userData.team;
+    document.getElementById('result-correct').innerText = correct;
+    document.getElementById('result-wrong').innerText = wrong;
+    currentFilter = 'all'; filterReview('all');
+    document.getElementById('screen-exam').classList.add('hidden');
+    document.getElementById('screen-result').classList.remove('hidden');
+    window.scrollTo({top:0,behavior:'smooth'});
+}
+function renderReviewList() {
+    const container = document.getElementById('review-list'); container.innerHTML = '';
+    const labels = ['A','B','C','D'];
+    rawQuestions.forEach((q,i)=>{
+        const userAns = userAnswers[i], correct = userAns===q.answer, unanswered = userAns===null;
+        if (currentFilter==='wrong' && correct) return;
+        if (currentFilter==='correct' && !correct) return;
+        const card = document.createElement('div');
+        card.className = `p-4 md:p-5 rounded-xl border-2 transition ${correct?'border-green-200 bg-green-50/40':'border-red-200 bg-red-50/40'}`;
+        const heading = document.createElement('div');
+        heading.className = 'flex justify-between items-start mb-3 gap-3';
+        const question = document.createElement('div'); question.className='font-bold text-slate-800 text-sm md:text-base';
+        const number = document.createElement('span'); number.className='text-blue-700'; number.textContent=`Soal #${i+1}. `;
+        question.append(number,document.createTextNode(q.q));
+        const badge = document.createElement('span');
+        badge.className = `flex-shrink-0 text-xs font-bold px-2.5 py-1 rounded-md border ${correct?'bg-green-100 text-green-800 border-green-300':unanswered?'bg-slate-100 text-slate-700 border-slate-300':'bg-red-100 text-red-800 border-red-300'}`;
+        badge.textContent = correct?'✓ BENAR':unanswered?'— TIDAK DIJAWAB':'✕ SALAH';
+        heading.append(question,badge); card.appendChild(heading);
+        const options = document.createElement('div'); options.className='grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3';
+        q.options.forEach((opt,j)=>{
+            const row=document.createElement('div');
+            let style='bg-white border-slate-200 text-slate-700';
+            if(j===q.answer) style='bg-green-100 border-green-500 text-green-900 font-semibold';
+            else if(j===userAns && !correct) style='bg-red-100 border-red-500 text-red-900 font-semibold';
+            row.className=`flex items-center p-3 rounded-lg border text-sm ${style}`;
+            const letter=document.createElement('span'); letter.className='font-bold mr-2 w-6 h-6 rounded bg-white/80 border border-slate-300 flex items-center justify-center text-xs'; letter.textContent=labels[j];
+            const optionText=document.createElement('span'); optionText.textContent=opt; row.append(letter,optionText);
+            if(j===q.answer){const icon=document.createElement('span');icon.className='ml-auto text-green-600';icon.textContent='✓';row.appendChild(icon);}
+            else if(j===userAns&&!correct){const icon=document.createElement('span');icon.className='ml-auto text-red-600';icon.textContent='✕';row.appendChild(icon);}
+            options.appendChild(row);
+        });
+        card.appendChild(options);
+        const explanation=document.createElement('div'); explanation.className='bg-white p-3 rounded-lg border border-slate-200 text-xs text-slate-600';
+        const title=document.createElement('strong'); title.className='block text-slate-800 mb-1'; title.textContent='💡 Pembahasan:';
+        const paragraph=document.createElement('p'); paragraph.className='text-slate-700 leading-relaxed'; paragraph.textContent=q.explain;
+        explanation.append(title,paragraph); card.appendChild(explanation); container.appendChild(card);
+    });
+    if(!container.children.length){const empty=document.createElement('div');empty.className='text-center py-8 text-slate-500 text-sm';empty.textContent='Tidak ada soal dalam kategori filter ini.';container.appendChild(empty);}
+}
+function filterReview(type) {
+    currentFilter=type;
+    ['all','wrong','correct'].forEach(t=>{
+        const button=document.getElementById(`filter-${t}`);
+        button.className=t===type?'px-3 py-1 rounded-md bg-white shadow-sm text-blue-700 font-bold':'px-3 py-1 rounded-md text-slate-600 hover:text-slate-900';
+    });
+    renderReviewList();
+}
+function resetExamState() {
+    userAnswers=new Array(QUESTION_COUNT).fill(null); userDoubt=new Array(QUESTION_COUNT).fill(false);
+    currentIndex=0; totalSeconds=25*60; currentFilter='all'; examFinished=false;
+    clearInterval(timerInterval); document.getElementById('timer-box').classList.remove('timer-warning');
+}
+function restartExam() {
+    if(!confirm('Apakah Anda ingin mengulang ujian dari awal? Data jawaban saat ini akan direset.')) return;
+    resetExamState();
+    document.getElementById('screen-result').classList.add('hidden');
+    document.getElementById('screen-login').classList.remove('hidden');
+    document.getElementById('header-exam-info').classList.add('hidden');
+    document.getElementById('input-team').value=''; document.getElementById('input-name').value='';
+    window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
